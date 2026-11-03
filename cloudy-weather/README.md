@@ -28,9 +28,12 @@ az provider register --namespace Microsoft.Web --wait
 az provider register --namespace Microsoft.Storage --wait
 az provider register --namespace Microsoft.Insights --wait
 
+# You can check the process with this command, fill in .Web/.Storage/.Insights
+az provider show --namespace Microsoft.Web --query registrationState -o tsv
+
 # Variables (app names must be globally unique, so a random number is added)
 RG=cloudy-weather-rg
-LOCATION=northeurope
+LOCATION=norwayeast    # use that because it's allowed on the student subscription
 SUFFIX=$RANDOM
 PLAN=cloudy-weather-plan
 WEB_APP=cloudy-weather-api-$SUFFIX
@@ -101,7 +104,7 @@ az functionapp create \
   --storage-account $STORAGE \
   --flexconsumption-location $LOCATION \
   --runtime dotnet-isolated \
-  --runtime-version 10.0
+  --runtime-version 10
 
 # Set the environment variable to PRODUCTION
 az functionapp config appsettings set \
@@ -120,8 +123,8 @@ az functionapp deployment source config-zip \
   --src publish/func.zip
 
 # Test (public endpoints, no function key needed)
-curl https://$(az functionapp show --name $FUNC_APP --resource-group $RG --query defaultHostName -o tsv)/ServiceCheck
-curl https://$(az functionapp show --name $FUNC_APP --resource-group $RG --query defaultHostName -o tsv)/api/Weather
+curl https://$FUNC_APP.azurewebsites.net/ServiceCheck
+curl https://$FUNC_APP.azurewebsites.net/api/Weather
 ```
 
 
